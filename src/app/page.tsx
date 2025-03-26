@@ -1,17 +1,25 @@
 import { Suspense } from "react";
 
-async function fetchData(query = "") {
+type Props = {
+  searchParams: Promise<{ [key: string]: string }>;
+};
 
+type Date = {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  category: string;
+}
+
+
+async function fetchData(query = "") {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
   const url = `${baseUrl}/api/search?q=${encodeURIComponent(query)}`;
-
-  console.log({query,url})
 
   const res = await fetch(url, {
     cache: "no-store", // Ensures fresh data on every request
   });
-
-
 
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -20,7 +28,8 @@ async function fetchData(query = "") {
   return res.json();
 }
 
-export default async function Home({ searchParams }:any) {
+
+export default async function Home({ searchParams }: Props) {
   const { q } = await searchParams;
 
   const data = await fetchData(q || "");
@@ -35,7 +44,7 @@ export default async function Home({ searchParams }:any) {
   );
 }
 
-function SearchResults({ data }: { data: any[] }) {
+function SearchResults({ data }: { data: Date[] }) {
   return (
     <ul className="space-y-4">
       {data.length > 0 ? (
